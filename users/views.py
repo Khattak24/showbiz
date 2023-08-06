@@ -50,6 +50,8 @@ class Signin(BaseAPIView):
             return self.send_bad_request_response(message="Password is required")
 
         user = User.objects.filter(email=request.data.get("email")).first()
+        if user is None:
+            return self.send_bad_request_response(message="Invalid user")
         if not user.check_password(request.data.get("password")):
             return self.send_bad_request_response(message="Invalid password")
 
@@ -67,6 +69,8 @@ class SearchProfessionals(BaseAPIView):
         profession = request.query_params.get("profession")
         if profession:
             user_ids = list(Profession.objects.filter(profession_name__icontains=profession).values_list("user", flat=True))
+        else:
+            user_ids = list(User.objects.filter(role=1).values_list("id", flat=True))
         if user_ids:
             users = User.objects.filter(id__in=user_ids)
             data = SearchSerializer(users, many=True).data

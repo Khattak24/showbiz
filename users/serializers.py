@@ -13,7 +13,9 @@ class UserSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         ret = super().to_representation(instance)
         if int(instance.role) == 1:
-            ret["professions"] = list(Profession.objects.filter(user=instance).values_list("profession_name", flat=True))
+            professions = list(Profession.objects.filter(user=instance).values_list("profession_name", flat=True))
+            ret["professions"] = professions
+            ret["is_profile_updated"] = True if professions else False
         ret["access_token"] = encode_jwt_token(instance)
         ret.pop("password")
         ret.pop("user_permissions")
@@ -50,7 +52,9 @@ class SearchSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
-        ret["professions"] = list(Profession.objects.filter(user=instance).values_list("profession_name", flat=True))
+        professions = list(Profession.objects.filter(user=instance).values_list("profession_name", flat=True))
+        ret["professions"] = professions
+        ret["is_profile_updated"] = True if professions else False
         ret.pop("password")
         ret.pop("user_permissions")
         ret.pop("groups")
