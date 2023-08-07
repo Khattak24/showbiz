@@ -1,8 +1,8 @@
 from django.contrib.auth.hashers import make_password
 from rest_framework.permissions import IsAuthenticated
 
-from users.models import User, Profession
-from users.serializers import UserSerializer, SearchSerializer
+from users.models import User, Profession, Project
+from users.serializers import UserSerializer, SearchSerializer, ProjectSerializer
 from utils.baseapiviews import BaseAPIView, get_first_error_message_from_serializer_errors
 from utils.baseauthentication import UserAuthentication
 from utils.reusable_methods import split_full_name
@@ -89,3 +89,21 @@ class UpdateProfessionProfile(BaseAPIView):
             userializer.save()
             return self.send_success_response("Success", self.serializer(request.user).data)
         return self.send_bad_request_response(get_first_error_message_from_serializer_errors(userializer.errors))
+
+
+class ProjectView(BaseAPIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [UserAuthentication]
+    serializer = ProjectSerializer
+
+    def post(self, request, *args, **kwargs):
+
+        project_serializer = ProjectSerializer(data=request.data, context={"request": request})
+        if project_serializer.is_valid():
+            project_serializer.save()
+            return self.send_success_response("Success")
+        return self.send_bad_request_response(get_first_error_message_from_serializer_errors(project_serializer.errors))
+
+    def get(self, request, *args, **kwargs):
+        instances = Project.objects.filter(user=request.user)
+        return self.send_success_response("Success", self.serializer(instances, many=True).data)

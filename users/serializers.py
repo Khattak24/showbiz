@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from users.models import User, Profession
+from users.models import User, Profession, Project
 from utils.baseauthentication import encode_jwt_token
 
 
@@ -61,3 +61,11 @@ class SearchSerializer(serializers.ModelSerializer):
         ret.pop("is_staff")
         ret.pop("is_superuser")
         return ret
+
+
+class ProjectSerializer(serializers.ModelSerializer):
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
+
+    class Meta:
+        model = Project
+        fields = "__all__"

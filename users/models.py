@@ -21,8 +21,17 @@ class User(AbstractUser, models.Model):
     phone_number = models.CharField(max_length=255, null=True, blank=True)
     biography = models.TextField()
     role = models.CharField(max_length=255, choices=RoleChoices.choices, null=True, blank=True)
+    last_name = models.CharField(max_length=255, null=True, blank=True)
+    image = models.FileField(null=True, blank=True, upload_to="profile")
 
 
 class Profession(models.Model):
     profession_name = models.CharField(max_length=255, blank=True, null=True)
+    user = models.ForeignKey(User, null=True, blank=True, on_delete=models.CASCADE)
+
+
+class Project(models.Model):
+    name = models.CharField(max_length=255)
+    role = models.CharField(max_length=255)
+    description = models.CharField(max_length=255)
     user = models.ForeignKey(User, null=True, blank=True, on_delete=models.CASCADE)
